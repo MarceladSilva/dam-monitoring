@@ -1,0 +1,62 @@
+@page "/monitoring"
+@inject NavigationManager NavigationManager
+
+<PageTitle>Monitoramento</PageTitle>
+
+<h1>Monitoramento</h1>
+
+<div class="mb-3">
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" checked="@(monitoringType == EMonitoringType.OnlineMonitoringRiskArea)" @onchange="@(e => monitoringType = EMonitoringType.OnlineMonitoringRiskArea)">
+        <label class="form-check-label" for="exampleRadios1">Monitoramento com alerta on-line, simulando o GPS do celular em área de risco?</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" checked="@(monitoringType == EMonitoringType.OnlineMonitoringSafeArea)" @onchange="@(e => monitoringType = EMonitoringType.OnlineMonitoringSafeArea)">
+        <label class="form-check-label" for="exampleRadios2">Monitoramento com alerta on-line, simulando o GPS do celular em área segura?</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3" checked="@(monitoringType == EMonitoringType.OfflineMonitoringRiskArea)" @onchange="@(e => monitoringType = EMonitoringType.OfflineMonitoringRiskArea)">
+        <label class="form-check-label" for="exampleRadios3">Monitoramento com alerta off-line, simulando a sirene em área de risco?</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios4" value="option4" checked="@(monitoringType == EMonitoringType.OfflineMonitoringSafeArea)" @onchange="@(e => monitoringType = EMonitoringType.OfflineMonitoringSafeArea)">
+        <label class="form-check-label" for="exampleRadios4">Monitoramento com alerta off-line, simulando a sirene em área segura?</label>
+    </div>
+</div>
+<div class="d-grid gap-2 d-md-block">
+    <button type="button" class="btn btn-primary" @onclick="NavigateTo">Monitorar</button>
+</div>
+
+@code {
+    private enum EMonitoringType
+    {
+        OnlineMonitoringRiskArea,
+        OnlineMonitoringSafeArea,
+        OfflineMonitoringRiskArea,
+        OfflineMonitoringSafeArea
+    }
+
+    private EMonitoringType monitoringType { get; set; } = EMonitoringType.OnlineMonitoringRiskArea;
+
+    private void NavigateTo()
+    {
+        switch (monitoringType)
+        {
+            case EMonitoringType.OnlineMonitoringSafeArea:
+                NavigationManager.NavigateTo("onlinemonitoringsafearea");
+                break;
+            
+            case EMonitoringType.OfflineMonitoringRiskArea:
+                NavigationManager.NavigateTo("offlinemonitoringriskarea");
+                break;
+
+            case EMonitoringType.OfflineMonitoringSafeArea:
+                NavigationManager.NavigateTo("offlinemonitoringsafearea");
+                break;
+
+            default:
+                NavigationManager.NavigateTo("onlinemonitoringriskarea");
+                break;
+        }
+    }
+}

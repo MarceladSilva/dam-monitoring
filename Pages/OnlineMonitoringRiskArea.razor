@@ -1,0 +1,92 @@
+@page "/onlinemonitoringriskarea"
+@implements IAsyncDisposable
+
+<PageTitle>Monitoramento</PageTitle>
+
+<h1>Monitoramento com alerta on-line, simulando o GPS do celular em área de risco!
+    @switch (AppState.Monitoring)
+    {
+        case <= 0:
+            <span class="badge text-bg-primary">@AppState.Monitoring.ToString()%</span>
+            break;
+
+        case > 75:
+            <span class="badge text-bg-danger">@AppState.Monitoring.ToString()%</span>
+            break;
+
+        case > 25:
+            <span class="badge text-bg-warning">@AppState.Monitoring.ToString()%</span>
+            break;
+
+        default:
+            <span class="badge text-bg-success">@AppState.Monitoring.ToString()%</span>
+            break;
+    }
+</h1>
+
+@if (AppState.Monitoring > 0)
+{
+    <hr>
+
+    <div class="d-flex justify-content-center">
+        @switch (AppState.Monitoring)
+        {
+            case > 75:
+                <div class="spinner-grow text-danger" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                break;
+
+            case > 25:
+                <div class="spinner-grow text-warning" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                break;
+
+            default:
+                <div class="spinner-grow text-success" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                break;
+        }
+    </div>
+}
+
+@if (AppState.Monitoring >= 100)
+{
+    <hr>
+
+    <div class="alert alert-danger" role="alert">
+        <h4 class="alert-heading">Rompimento/Transbordamento de Barragem!</h4>
+        <p>Nesse momento, precisamos que você mantenha a calma e siga as instruções abaixo:</p>
+        <hr>
+        <p class="mb-0">Dirija-se para o seguinte endereço: Rua Segura, número seguro.</p>
+    </div>    
+}
+
+@code {
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(AppState.URL_SIGNALR)
+            .WithAutomaticReconnect()
+            .Build();
+
+        hubConnection.On<int>(AppState.RECEIVE_MONITORING, (monitoring) =>
+        {
+            AppState.Monitoring = monitoring;
+            
+            InvokeAsync(StateHasChanged);
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+            await hubConnection.DisposeAsync();
+    }
+}
